@@ -1,4 +1,3 @@
-
 # Load necessary packages. 
 packages <- c("dplyr","reshape2")
 
@@ -12,6 +11,7 @@ sapply(packages, require, character.only= TRUE)
 
 #-----------
 # Step 1, 
+#-----------
 
 ## Download and unzip the dataset:
 filename <- "getdata_dataset.zip"
@@ -46,9 +46,10 @@ tidy_data <- cbind(subject, y, x)
 
 remove("filename","packages","subject","subject_test" , "subject_train" ,"x","x_test","x_train","y", "y_test","y_train")
 #-----------
-# For step 2, we first put proper name for each column in our dataset.
-# Once they have name, we select those columns with 'mean' or 'std' in their name
+# Step 2: Put proper name for each column in our dataset.
+# Once they have name, we select those columns with 'mean' or 'std' in their column name
 #-----------
+
 # Read feature names from respective file
 # Note: The first part of this task is respond to the part of 4 of this assignment.
 featureNames <- read.delim("UCI HAR Dataset/features.txt", header = FALSE,sep = " ",colClasses = c("NULL",NA))
@@ -62,19 +63,22 @@ names(tidy_data) <- c("Subject","Activity",valid_labels)
 tidy_data <- tidy_data %>% select(Subject, Activity, matches("mean()|std()", ignore.case=TRUE))
 
 #-----------
-# For step 3, we read descriptive activity names from 'activity_labels.txt' file
+# Step 3: Read descriptive activity names from 'activity_labels.txt' file
 #-----------
 descriptiveActivityNames <- read.delim("UCI HAR Dataset/activity_labels.txt", sep="", header = FALSE)
 
+# Bind descriptive names to the tidy_data
 tidy_data <- merge(descriptiveActivityNames, tidy_data,by.y = "Activity",by.x = "V1")
 
-#Removing activitycode from dataset
+# Removing excess 'V1' column from dataset. This column comes from 'descriptiveActivityNames' and played the role of primary key
+# but it is no more required after the join completed.
 tidy_data$V1 <- NULL
 
+# Rename the V2 to 'Activity'
 tidy_data <- rename(tidy_data, Activity= V2)
 
 #-----------
-# For step 4,
+# Step 4,
 #-----------
 # We have already done this part in 2. Below 4 lines are response to this section. In part 2, for selecting features of
 # 'mean' and 'std', we use their name.
@@ -85,7 +89,7 @@ tidy_data <- rename(tidy_data, Activity= V2)
 # names(tidy_data) <- c("Subject","Activity",valid_labels)
 
 #-----------
-# For step 5,
+# Step 5
 #-----------
 
 #creates a second, independent tidy data set with the average of each variable for each activity and each subject.\
