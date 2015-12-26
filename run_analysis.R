@@ -8,7 +8,6 @@ if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
 
 # Now load all the packages listed in 'packages' variable. One by one.
 sapply(packages, require, character.only= TRUE)
-
 #-----------
 # Step 1, 
 #-----------
@@ -94,11 +93,20 @@ names(tidy_data) <- c("Activity","Subject",labels)
 #-----------
 # Step 5
 #-----------
-
-#creates a second, independent tidy data set with the average of each variable for each activity and each subject.\
+cat(paste("* ",names(tidy_data),"\n"))
 tidyData.melted <- melt(tidy_data, id = c("Subject", "Activity"))
 tidyData.mean <- dcast(tidyData.melted, Subject + Activity ~ variable, mean)
 
+# We need to update the column names since each column containts the mean value of 
+# the respected feature. So, we add _Avg after each column name and replace the column
+# name.
+labels <- lapply(labels, paste0, "_Avg")
+names(tidyData.mean) <- c("Activity","Subject",labels)
 write.table(tidyData.mean, "tidy.txt", row.names = FALSE, quote = FALSE)
+
+# This output is used in MarkDown document
+write.table(tidyData.mean, "tidyWithLabels.txt", row.names = TRUE, quote = FALSE)
+
+
 # Clean up the memory
 rm(list = ls(all.names = TRUE))
