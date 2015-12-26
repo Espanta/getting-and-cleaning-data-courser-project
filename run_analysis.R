@@ -37,57 +37,60 @@ x <- rbind(x_test,x_train)
 
 # similarly, append y_train to y_test to make a 'y' dataset including all test + train data
 y <- rbind(y_test,y_train)
+# Set column name
+names(y) <- "ActivityID"
 
 # And finally append the subject from test to the train to make a 'subject' variable
 subject <- rbind(subject_test, subject_train)
+# Set column name
+names(subject) <- "Subject"
 
 # Now, we can bind x and y columnwise to make a single dataset.
 tidy_data <- cbind(subject, y, x)
-
 remove("filename","packages","subject","subject_test" , "subject_train" ,"x","x_test","x_train","y", "y_test","y_train")
 #-----------
-# Step 2: Put proper name for each column in our dataset.
-# Once they have name, we select those columns with 'mean' or 'std' in their column name
+# Step 2: Read feature names from file. Then use the names to select those columns with 'mean' or 'stf' in their column name
 #-----------
 
 # Read feature names from respective file
 # Note: The first part of this task is respond to the part of 4 of this assignment.
 featureNames <- read.delim("UCI HAR Dataset/features.txt", header = FALSE,sep = " ",colClasses = c("NULL",NA))
 labels <- matrix(unlist(featureNames), ncol = 1)
-valid_labels <- make.names(labels, unique = TRUE, allow_ = TRUE)
+desiredCol<-grepl("-mean()|-std()",labels)
+tidy_data<-tidy_data[,desiredCol]
 
 # Adding label for "Y" data which is the indicator for the respected activity
-names(tidy_data) <- c("Subject","Activity",valid_labels)
+#names(tidy_data) <- c("Subject","Activity",valid_labels)
 
 # Now, we can select only those features with mean or std.
-tidy_data <- tidy_data %>% select(Subject, Activity, matches("mean()|std()", ignore.case=TRUE))
+#tidy_data <- tidy_data %>% select(Subject, Activity, matches("mean()|std()", ignore.case=TRUE))
 
 #-----------
 # Step 3: Read descriptive activity names from 'activity_labels.txt' file
 #-----------
 descriptiveActivityNames <- read.delim("UCI HAR Dataset/activity_labels.txt", sep="", header = FALSE)
+names(descriptiveActivityNames) <- c("ActivityID","Activity")
+tidy_data_bk<-tidy_data
 
 # Bind descriptive names to the tidy_data
-tidy_data <- merge(descriptiveActivityNames, tidy_data,by.y = "Activity",by.x = "V1")
+tidy_data <- merge(descriptiveActivityNames, tidy_data, "ActivityID")
 
-# Removing excess 'V1' column from dataset. This column comes from 'descriptiveActivityNames' and played the role of primary key
+# Removing excess 'ActivityID' column from dataset. This column comes from 'descriptiveActivityNames' and played the role of primary key
 # but it is no more required after the join completed.
-tidy_data$V1 <- NULL
-
-# Rename the V2 to 'Activity'
-tidy_data <- rename(tidy_data, Activity= V2)
+tidy_data$ActivityID <- NULL
 
 #-----------
 # Step 4,
 #-----------
-# We have already done this part in 2. Below 4 lines are response to this section. In part 2, for selecting features of
-# 'mean' and 'std', we use their name.
+#Create an index that matched those columns that we have selectied in step 2. Using the index, we can subset the useful labels and add them
+# to dataframe
+ index<-matrix(unlist(desiredCol),1)
+ labels <- featureNames[index]
+ ?gsub
+labels <- gsub("\\(\\)","",labels)
+names(tidy_data) <- c("Activity","Subject",labels)
 
-# featureNames <- read.delim("UCI HAR Dataset/features.txt", header = FALSE,sep = " ",colClasses = c("NULL",NA))
-# labels <- matrix(unlist(featureNames), ncol = 1)
-# valid_labels <- make.names(labels, unique = TRUE, allow_ = TRUE)
-# names(tidy_data) <- c("Subject","Activity",valid_labels)
-
+cat(paste("* ",names(tidy_data)),sep = "\n")
 #-----------
 # Step 5
 #-----------
@@ -97,6 +100,7 @@ tidyData.melted <- melt(tidy_data, id = c("Subject", "Activity"))
 tidyData.mean <- dcast(tidyData.melted, Subject + Activity ~ variable, mean)
 
 write.table(tidyData.mean, "tidy.txt", row.names = FALSE, quote = FALSE)
-
+c<-unique(tidy_data$Subject)
+length(c)
 # Clean up the memory
 rm(list = ls(all.names = TRUE))
