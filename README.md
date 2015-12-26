@@ -1,7 +1,7 @@
 # Getting-and-Cleaning-Data (Course Project)
 This course project is completed as partial requirement of the Course entered "Getting and Cleaning Data" offered by Coursera.
 
-## This script does five main tasks listed below:
+## This script does below main tasks:
 *  Downloads and unzips the zipped data source from the given URL if dataset does not exist in working directory.
 *  Reads required csv files into R environment.
 *  Merges the training and the test sets to create one data set.
