@@ -1,4 +1,4 @@
-# Getting-and-Cleaning-Data (courser project)
+# Getting-and-Cleaning-Data (Course Project)
 This course project is completed as partial requirement of the Course entered "Getting and Cleaning Data" offered by Coursera.
 
 # This script does five main tasks listed below:
