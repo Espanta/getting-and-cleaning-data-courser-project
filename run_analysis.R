@@ -82,15 +82,15 @@ tidy_data$ActivityID <- NULL
 #-----------
 # Step 4,
 #-----------
-#Create an index that matched those columns that we have selectied in step 2. Using the index, we can subset the useful labels and add them
-# to dataframe
- index<-matrix(unlist(desiredCol),1)
- labels <- featureNames[index]
- ?gsub
+#Create an index that matched those columns that we have selectied in step 2. 
+# Using the index, we can subset the useful labels and add them to dataframe
+index<-matrix(unlist(desiredCol),1)
+labels <- featureNames[index]
+
+# Clean labels from symbols like '(' and ')'
 labels <- gsub("\\(\\)","",labels)
 names(tidy_data) <- c("Activity","Subject",labels)
 
-cat(paste("* ",names(tidy_data)),sep = "\n")
 #-----------
 # Step 5
 #-----------
@@ -100,7 +100,5 @@ tidyData.melted <- melt(tidy_data, id = c("Subject", "Activity"))
 tidyData.mean <- dcast(tidyData.melted, Subject + Activity ~ variable, mean)
 
 write.table(tidyData.mean, "tidy.txt", row.names = FALSE, quote = FALSE)
-c<-unique(tidy_data$Subject)
-length(c)
 # Clean up the memory
 rm(list = ls(all.names = TRUE))
